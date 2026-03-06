@@ -93,7 +93,7 @@ Turn 2 (follow-up, when results arrive):
 |---|---|
 | ✅ Pros | No history rewriting, no synthetic tool calls, clean conversation flow |
 | ❌ Cons | **Not universally supported** — requires the API to accept a FunctionResponse without a matching FunctionCall in the immediately preceding turn |
-| 📊 Support | Gemini ✅ · Claude ❌ · OpenAI untested |
+| 📊 Support | Gemini ✅ · Claude ❌ · OpenAI ✅ |
 
 ### Approach B: History Replacement
 
@@ -120,7 +120,7 @@ History after replacement:
 |---|---|
 | ✅ Pros | Works with **any** LLM API — only requires standard tool calling support |
 | ❌ Cons | Requires application-layer history management; model re-generates its response (no incremental update); intermediate "I'm searching..." response is lost from history |
-| 📊 Support | Gemini ✅ · Claude ✅ · OpenAI untested |
+| 📊 Support | Gemini ✅ · Claude ✅ · OpenAI ✅ |
 
 > **⚠️ Critical limitation**: History Replacement only works if **nothing else
 > happened** between dispatch and completion. If the user sent follow-up
@@ -210,7 +210,7 @@ History:
 | No prompt engineering needed | ✅ | ✅ | ✅ | ❌ |
 
 **Recommendation**: Use **Follow-up FR** (Approach A) where the API supports it
-(Gemini). For APIs that don't (Claude), the choice depends on the use case:
+(Gemini, OpenAI). For APIs that don't (Claude), the choice depends on the use case:
 - **No intermediate interactions** (dispatch → wait → deliver): use **History
   Replacement** (Approach B) — simple and clean.
 - **Conversation continues while tools run**: choose between **Injected Tool
@@ -273,7 +273,7 @@ uv run pytest proofs/ -v
 | Gemini 2.5 Flash | [python-genai](https://github.com/googleapis/python-genai) | ✅ | — | [`proofs/gemini_genai/`](./proofs/gemini_genai/) |
 | Claude Haiku 4.5 | [anthropic\[vertex\]](https://github.com/anthropics/anthropic-sdk-python) | ❌ | ✅ | [`proofs/claude_vertex/`](./proofs/claude_vertex/) |
 | Claude Sonnet 4.6 | [anthropic\[vertex\]](https://github.com/anthropics/anthropic-sdk-python) | ❌ | ✅ | [`proofs/claude_vertex/`](./proofs/claude_vertex/) |
-| OpenAI GPT-4o | openai | untested | untested | — |
+| OpenAI GPT-5.4 | [openai](https://github.com/openai/openai-python) | ✅ | — | [`proofs/openai_responses/`](./proofs/openai_responses/) |
 
 **Follow-up FR** = send a new FunctionResponse/tool_result for the same call ID
 in a later conversation turn (the approach described in this README).
@@ -296,6 +296,22 @@ export GOOGLE_CLOUD_PROJECT=your-project-id
 export GOOGLE_CLOUD_LOCATION=us-central1
 
 uv run pytest proofs/gemini_genai/ -v
+```
+
+### OpenAI GPT-5.4 (`openai` — Responses API)
+
+Follow-up `function_call_output` messages work natively. The Responses API
+correlates by `call_id`, accepting a second output for the same call in a later
+turn.
+
+```bash
+# Option A: Platform API key
+export OPENAI_API_KEY=your-api-key
+
+# Option B: ChatGPT subscription via Codex endpoint
+uv run python -m proofs.openai_responses.login
+
+uv run pytest proofs/openai_responses/ -v
 ```
 
 ### Claude Haiku 4.5 (`anthropic[vertex]`)
