@@ -6,8 +6,6 @@ and printing events as they arrive.
 """
 
 import asyncio
-import os
-
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 
@@ -80,5 +78,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "1"
     asyncio.run(main())
