@@ -81,6 +81,4 @@ async def main():
 
 if __name__ == "__main__":
     os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "1"
-    os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "rd-stationary-services-int")
-    os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "europe-west1")
     asyncio.run(main())
